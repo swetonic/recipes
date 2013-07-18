@@ -1,0 +1,9 @@
+/data/<%= @app_name %>/current/log/* {
+    rotate 30
+    size 100M
+    compress
+    missingok
+    notifempty
+    sharedscripts
+    extension gz
+}

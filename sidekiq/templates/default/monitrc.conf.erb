@@ -1,0 +1,5 @@
+check process sidekiq_<%= @app_name %>
+  with pidfile /var/run/engineyard/sidekiq/<%= @app_name %>/sidekiq.pid
+  start program = "/data/main/current/script/sidekiq" with timeout 90 seconds
+  stop program = "pkill -f sidekiq" with timeout 90 seconds
+  group <%= @app_name %>_sidekiq

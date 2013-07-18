@@ -1,0 +1,52 @@
+<% (@num_workers - 5).times do |num| %>
+check process sidekiq_<%= @app_name %>_<%= num %>
+  with pidfile /var/run/engineyard/sidekiq/<%= @app_name %>/sidekiq_<%= num %>.yml.pid
+  start program = "/engineyard/bin/sidekiq <%= @app_name %> start <%= @rails_env  %> sidekiq_<%= num %>.yml" with timeout 90 seconds
+  stop program = "/engineyard/bin/sidekiq <%= @app_name %> stop <%= @rails_env  %> sidekiq_<%= num %>.yml" with timeout 90 seconds
+  if totalmem is greater than 500 MB for 2 cycles then restart # eating up memory?
+  group <%= @app_name %>_sidekiq
+<% end %>
+
+
+check process sidekiq_<%= @app_name %>_blocker
+  with pidfile /var/run/engineyard/sidekiq/<%= @app_name %>/sidekiq_blocker.yml.pid
+  start program = "/engineyard/bin/sidekiq_blocker <%= @app_name %> start <%= @rails_env  %> sidekiq_blocker.yml" with timeout 90 seconds
+  stop program = "/engineyard/bin/sidekiq_blocker <%= @app_name %> stop <%= @rails_env  %> sidekiq_blocker.yml" with timeout 90 seconds
+  if totalmem is greater than 500 MB for 2 cycles then restart # eating up memory?
+  group <%= @app_name %>_sidekiq
+
+check process sidekiq_<%= @app_name %>_bottleneck0
+  with pidfile /var/run/engineyard/sidekiq/<%= @app_name %>/sidekiq_bottleneck0.yml.pid
+  start program = "/engineyard/bin/sidekiq_bottleneck0 <%= @app_name %> start <%= @rails_env  %> sidekiq_bottleneck0.yml" with timeout 90 seconds
+  stop program = "/engineyard/bin/sidekiq_bottleneck0 <%= @app_name %> stop <%= @rails_env  %> sidekiq_bottleneck0.yml" with timeout 90 seconds
+  if totalmem is greater than 500 MB for 2 cycles then restart # eating up memory?
+  group <%= @app_name %>_sidekiq
+  
+  check process sidekiq_<%= @app_name %>_bottleneck1
+  with pidfile /var/run/engineyard/sidekiq/<%= @app_name %>/sidekiq_bottleneck1.yml.pid
+  start program = "/engineyard/bin/sidekiq_bottleneck1 <%= @app_name %> start <%= @rails_env  %> sidekiq_bottleneck1.yml" with timeout 90 seconds
+  stop program = "/engineyard/bin/sidekiq_bottleneck1 <%= @app_name %> stop <%= @rails_env  %> sidekiq_bottleneck1.yml" with timeout 90 seconds
+  if totalmem is greater than 500 MB for 2 cycles then restart # eating up memory?
+  group <%= @app_name %>_sidekiq
+  
+check process sidekiq_<%= @app_name %>_bottleneck2
+  with pidfile /var/run/engineyard/sidekiq/<%= @app_name %>/sidekiq_bottleneck2.yml.pid
+  start program = "/engineyard/bin/sidekiq_bottleneck2 <%= @app_name %> start <%= @rails_env  %> sidekiq_bottleneck2.yml" with timeout 90 seconds
+  stop program = "/engineyard/bin/sidekiq_bottleneck2 <%= @app_name %> stop <%= @rails_env  %> sidekiq_bottleneck2.yml" with timeout 90 seconds
+  if totalmem is greater than 500 MB for 2 cycles then restart # eating up memory?
+  group <%= @app_name %>_sidekiq  
+
+check process sidekiq_<%= @app_name %>_email
+  with pidfile /var/run/engineyard/sidekiq/<%= @app_name %>/sidekiq_email.yml.pid
+  start program = "/engineyard/bin/sidekiq_email <%= @app_name %> start <%= @rails_env  %> sidekiq_email.yml" with timeout 90 seconds
+  stop program = "/engineyard/bin/sidekiq_email <%= @app_name %> stop <%= @rails_env  %> sidekiq_email.yml" with timeout 90 seconds
+  if totalmem is greater than 500 MB for 2 cycles then restart # eating up memory?
+  group <%= @app_name %>_sidekiq
+ 
+
+check process sidekiq_web_head
+  with pidfile /var/run/engineyard/sidekiq/<%= @app_name %>/sidekiq_webhead.pid
+  start program = "/data/<%= @app_name %>/current/ey_bundler_binstubs/unicorn -p 80 -D /data/<%= @app_name %>/current/sidekiq.ru"
+  stop program = "/bin/bash -c '/bin/kill `cat /var/run/engineyard/sidekiq/<%= @app_name %>/sidekiq_webhead.pid`'"
+  if totalmem is greater than 500 MB for 2 cycles then restart
+  group <%= @app_name %>_sidekiq_webhead
