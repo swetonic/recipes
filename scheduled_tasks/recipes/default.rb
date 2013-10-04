@@ -154,6 +154,13 @@ if sidekiq_instance?
     command "/bin/bash -l -c 'cd /data/main/current && script/rails runner -e production '\''DiamondExporter.new.export_diamonds'\'' >> cron_error.log 2>&1'"
   end
   
+  cron 'export_diamond_vendors' do
+    minute  '5'
+    hour    '5'
+    user    node[:owner_name]
+    command "/bin/bash -l -c 'cd /data/main/current && script/rails runner -e production '\''DiamondExporter.new.export_vendors'\'' >> cron_error.log 2>&1'"
+  end
+  
   # refresh_diamonds needs to have pentaho run first
   cron 'refresh_diamonds' do
     minute  '35'
